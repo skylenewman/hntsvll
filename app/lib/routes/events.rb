@@ -13,16 +13,16 @@ Pakyow::App.routes(:events) do
           redirect '/errors/404'
         end
         if people.admin
-          cwnbhm = Group.where("name = 'CoWorking Night: Birmingham'").first
-          cwnbhmevents = Group.where("name = 'CoWorking Night Events: Birmingham'").first
-          events_all = Event.where('start_datetime > ?', DateTime.now.utc).where('archived = ?', false)
-                        .where('group_id != ? and group_id != ?', cwnbhm.id, cwnbhmevents.id).all
+          cwnbhm = Group.where(Sequel.lit("name = 'CoWorking Night: Birmingham'")).first
+          cwnbhmevents = Group.where(Sequel.lit("name = 'CoWorking Night Events: Birmingham'")).first
+          events_all = Event.where(Sequel.lit('start_datetime > ?', DateTime.now.utc)).where(Sequel.lit('archived = ?', false))
+                        .where(Sequel.lit('group_id != ? and group_id != ?', cwnbhm.id, cwnbhmevents.id)).all
         else
           people.groups().each { |group|
             if group.name == 'CoWorking Night: Birmingham' || group.name == 'CoWorking Night Events: Birmingham'
               next
             end
-            events = Event.where('group_id = ?', group.id).where('start_datetime > ?', DateTime.now.utc).where('archived = ?', false).all
+            events = Event.where(Sequel.lit('group_id = ?', group.id)).where(Sequel.lit('start_datetime > ?', DateTime.now.utc)).where(Sequel.lit('archived = ?', false)).all
             events.each { |event|
               events_all.push(event)
             }
@@ -46,7 +46,7 @@ Pakyow::App.routes(:events) do
           redirect "/errors/404"
         end
         event.approved = true
-        previous_event = Event.where("approved = true AND group_id = ? AND start_datetime < ?", event.group_id, event.start_datetime).order(:start_datetime).last
+        previous_event = Event.where(Sequel.lit("approved = true AND group_id = ? AND start_datetime < ?", event.group_id, event.start_datetime)).order(:start_datetime).last
         instance_number = 1
         unless previous_event.nil?
           instance_number = previous_event.instance_number + 1
@@ -91,7 +91,7 @@ Pakyow::App.routes(:events) do
         if params[:events_id].is_number? == false
           redirect "/errors/404"
         end
-        event = Event.where("id = ?", params[:events_id]).first
+        event = Event.where(Sequel.lit("id = ?", params[:events_id])).first
         if event.nil?
           redirect "/errors/404"
         end
@@ -123,7 +123,7 @@ Pakyow::App.routes(:events) do
       end
       events_all = []
       people.groups().each { |group|
-        events = Event.where('group_id = ?', group.id).all
+        events = Event.where(Sequel.lit('group_id = ?', group.id)).all
         events.each { |event|
           events_all.push(event)
         }
@@ -144,7 +144,7 @@ Pakyow::App.routes(:events) do
       if params[:events_id].is_number? == false
         redirect "/errors/404"
       end
-      event = Event.where("id = ?", params[:events_id]).first
+      event = Event.where(Sequel.lit("id = ?", params[:events_id])).first
       if event.nil?
         redirect "/errors/404"
       end
@@ -179,12 +179,12 @@ Pakyow::App.routes(:events) do
         redirect '/errors/404'
       end
       parsed_time = DateTime.strptime(params[:events][:start_datetime] + "-0600", '%b %d, %Y %I:%M %p %Z')
-      previous_event = Event.where("approved = true AND group_id = ? AND start_datetime < ?", params[:events][:parent_group].to_i, parsed_time.to_datetime.utc).order(:start_datetime).last
+      previous_event = Event.where(Sequel.lit("approved = true AND group_id = ? AND start_datetime < ?", params[:events][:parent_group].to_i, parsed_time.to_datetime.utc)).order(:start_datetime).last
       instance_number = 1
       unless previous_event.nil?
         instance_number = previous_event.instance_number + 1
       end
-      group = Group.where("id = ?", params[:events][:parent_group].to_i).first
+      group = Group.where(Sequel.lit("id = ?", params[:events][:parent_group].to_i)).first
       c_params =
         {
           "name" => params[:events][:name],
@@ -220,7 +220,7 @@ Pakyow::App.routes(:events) do
       if params[:events][:id].is_number? == false
         redirect "/errors/404"
       end
-      event = Event.where("id = ?", params[:events][:id]).first
+      event = Event.where(Sequel.lit("id = ?", params[:events][:id])).first
       if event.nil?
         redirect "/errors/404"
       end
@@ -269,7 +269,7 @@ Pakyow::App.routes(:events) do
       if params[:events_id].is_number? == false
         redirect "/errors/404"
       end
-      event = Event.where("id = ?", params[:events_id]).first
+      event = Event.where(Sequel.lit("id = ?", params[:events_id])).first
       if event.nil?
         redirect "/errors/404"
       end
