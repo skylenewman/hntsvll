@@ -132,7 +132,7 @@ GEM
       htmlentities (>= 4.0.0)
     public_suffix (3.0.2)
     puma (3.11.3)
-    rack (1.6.11)
+    rack (1.6.12)
     rack-ssl (1.4.1)
       rack
     rake (11.3.0)
